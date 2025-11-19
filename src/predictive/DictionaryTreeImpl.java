@@ -6,17 +6,11 @@ import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
 
-/**
- * Implementasi Dictionary menggunakan tree (trie) atas digit 2–9.
- * Tiap node menyimpan:
- *   - children[0..7]  → digit 2..9
- *   - words           → kata yang signature-nya PERSIS sama dengan path ke node itu
- */
+
 public class DictionaryTreeImpl implements Dictionary {
 
-    /** Node untuk tiap digit di tree. */
     private static class Node {
-        Node[] children = new Node[8]; // index 0 = '2', 1 = '3', ..., 7 = '9'
+        Node[] children = new Node[8]; 
         Set<String> words = new HashSet<>();
     }
 
@@ -41,13 +35,13 @@ public class DictionaryTreeImpl implements Dictionary {
         }
     }
 
-    /** Masukkan satu kata ke dalam tree berdasarkan signature-nya. */
+
     private void insert(String signature, String word) {
         Node current = root;
         for (int i = 0; i < signature.length(); i++) {
             char c = signature.charAt(i);
             if (c < '2' || c > '9') {
-                return; // signature tidak valid, abaikan
+                return; 
             }
             int index = c - '2';
             if (current.children[index] == null) {
@@ -58,7 +52,6 @@ public class DictionaryTreeImpl implements Dictionary {
         current.words.add(word);
     }
 
-    /** Helper: jalan di tree mengikuti signature, kembalikan node terakhir. */
     private Node getNode(String signature) {
         Node current = root;
         for (int i = 0; i < signature.length(); i++) {
@@ -75,7 +68,6 @@ public class DictionaryTreeImpl implements Dictionary {
         return current;
     }
 
-    /** Exact match: ambil kata-kata di node untuk signature ini. */
     @Override
     public Set<String> signatureToWords(String signature) {
         Node node = getNode(signature);
@@ -85,7 +77,6 @@ public class DictionaryTreeImpl implements Dictionary {
         return new HashSet<>(node.words);
     }
 
-    /** Prefix match: kumpulkan semua kata di subtree mulai dari prefix. */
     @Override
     public Set<String> signatureToWordsPrefix(String prefixSignature) {
         Set<String> result = new HashSet<>();
@@ -97,7 +88,6 @@ public class DictionaryTreeImpl implements Dictionary {
         return result;
     }
 
-    /** DFS kumpulkan semua kata di bawah node ini. */
     private void collectWords(Node node, Set<String> result) {
         result.addAll(node.words);
         for (Node child : node.children) {
