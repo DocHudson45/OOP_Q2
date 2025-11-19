@@ -5,7 +5,6 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.geom.RoundRectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -71,7 +70,7 @@ public class PredictiveGUI extends JFrame {
         Color textDark = new Color(40, 40, 40);
         Color textWhite = Color.WHITE;
 
-        addKeyButton(keypadPanel, "1", "Del", glassOrange, textWhite);
+        addKeyButton(keypadPanel, "1", ".,?!", glassWhite, textDark);
         addKeyButton(keypadPanel, "2", "abc", glassWhite, textDark);
         addKeyButton(keypadPanel, "3", "def", glassWhite, textDark);
 
@@ -85,7 +84,7 @@ public class PredictiveGUI extends JFrame {
 
         addKeyButton(keypadPanel, "*", "Next", glassOrange, textWhite);
         addKeyButton(keypadPanel, "0", "_", glassWhite, textDark);
-        addKeyButton(keypadPanel, "#", "Send", glassOrange, textWhite);
+        addKeyButton(keypadPanel, "#", "Del", glassOrange, textWhite);
 
         mainPanel.add(keypadPanel, BorderLayout.CENTER);
     }
@@ -104,14 +103,14 @@ public class PredictiveGUI extends JFrame {
             currentSignature.append(c);
             updateCandidates();
         } else if (c == '1') {
+            
+        } else if (c == '*') {
+            showNextCandidate();
+        } else if (c == '#') {
             if (currentSignature.length() > 0) {
                 currentSignature.setLength(currentSignature.length() - 1);
                 updateCandidates();
             }
-        } else if (c == '*') {
-            showNextCandidate();
-        } else if (c == '#') {
-            acceptCurrentWord();
         } else if (c == '0') {
             acceptCurrentWord();
             messageArea.append(" ");
