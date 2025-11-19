@@ -6,7 +6,7 @@ public class Sigs2WordsProto {
         for (String sig : args) {
             System.out.print(sig + ": ");
             Set<String> matches = PredictivePrototype.signatureToWords(sig);
-            System.out.println(matches); // Format output list [cite: 121]
+            System.out.println(matches); 
         }
     }
 }
