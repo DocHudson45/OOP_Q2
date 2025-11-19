@@ -1,26 +1,36 @@
 package predictive;
 
 public class WordSig implements Comparable<WordSig> {
-    private String words;
-    private String signature;
 
-    public WordSig(String words, String signature) {
-        this.words = words;
+    private final String word;
+    private final String signature;
+
+    public WordSig(String word, String signature) {
+        this.word = word.toLowerCase();
         this.signature = signature;
     }
 
-    public String getWords() {
-        return words;
+    public WordSig(String word) {
+        this(word.toLowerCase(), PredictivePrototype.wordToSignature(word));
+    }
+
+    public String getWord() {
+        return word;
     }
 
     public String getSignature() {
         return signature;
     }
 
-    // Method wajib karena implement Comparable
-    // Kita compare berdasarkan SIGNATURE-nya, bukan katanya.
     @Override
-    public int compareTo(WordSig ws) {
-        return this.signature.compareTo(ws.signature);
+    public int compareTo(WordSig other) {
+        int cmp = this.signature.compareTo(other.signature);
+        if (cmp != 0) return cmp;
+        return this.word.compareTo(other.word);
+    }
+
+    @Override
+    public String toString() {
+        return word + ":" + signature;
     }
 }

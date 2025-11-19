@@ -2,76 +2,56 @@ package predictive;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Scanner;
-import java.util.Set;
+import java.util.*;
 
 public class DictionaryListImpl implements Dictionary {
-    private List<WordSig> dictionary;
 
-    // Constructor: Baca file dan isi ke memori
+    private final List<WordSig> entries = new ArrayList<>();
+
     public DictionaryListImpl() {
-        dictionary = new ArrayList<>();
-        try {
-            Scanner scanner = new Scanner(new File("words")); // Pastikan file words ada di root folder
-            while (scanner.hasNextLine()) {
-                String word = scanner.nextLine().trim().toLowerCase();
-                if (isValidWord(word)) {
-                    // Pakai method dari Part 1 buat generate signature
-                    String sig = PredictivePrototype.wordToSignature(word);
-                    dictionary.add(new WordSig(word, sig));
+        File dictFile = new File("words");
+
+        try (Scanner sc = new Scanner(dictFile)) {
+            while (sc.hasNextLine()) {
+                String word = sc.nextLine().trim().toLowerCase();
+                if (word.matches("[a-z]+")) {
+                    entries.add(new WordSig(word));
                 }
             }
-            scanner.close();
-
-            // Sort biar bisa di-Binary Search [cite: 166]
-            Collections.sort(dictionary);
-
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            System.err.println("Dictionary file 'words' not found.");
         }
-    }
 
-    // Helper method
-    private static boolean isValidWord(String word) {
-        return word.matches("[a-z]+");
+        Collections.sort(entries);
     }
 
     @Override
     public Set<String> signatureToWords(String signature) {
         Set<String> result = new HashSet<>();
 
-        // Karena kita cuma punya signature target, kita bikin dummy object buat dicari
-        WordSig target = new WordSig("", signature);
+        int left = 0, right = entries.size() - 1;
+        int firstIdx = -1;
 
-        // Binary Search [cite: 166]
-        int index = Collections.binarySearch(dictionary, target);
+        while (left <= right) {
+            int mid = (left + right) / 2;
+            int cmp = entries.get(mid).getSignature().compareTo(signature);
 
-        // Jika ketemu (index >= 0)
-        if (index >= 0) {
-            // Ambil kata di index yang ketemu
-            result.add(dictionary.get(index).getWords());
-
-            // TAPI INGAT! Binary search cuma nemu SATU posisi.
-            // Padahal mungkin ada banyak kata dengan signature sama di atas atau bawahnya.
-            // Kita harus cek tetangga atas dan bawahnya.
-
-            // Cek ke atas (sebelum index)
-            int i = index - 1;
-            while (i >= 0 && dictionary.get(i).getSignature().equals(signature)) {
-                result.add(dictionary.get(i).getWords());
-                i--;
+            if (cmp == 0) {
+                firstIdx = mid;
+                right = mid - 1;
+            } else if (cmp < 0) {
+                left = mid + 1;
+            } else {
+                right = mid - 1;
             }
+        }
 
-            // Cek ke bawah (setelah index)
-            int j = index + 1;
-            while (j < dictionary.size() && dictionary.get(j).getSignature().equals(signature)) {
-                result.add(dictionary.get(j).getWords());
-                j++;
-            }
+        if (firstIdx == -1) return result;
+
+        for (int i = firstIdx; i < entries.size(); i++) {
+            WordSig ws = entries.get(i);
+            if (!ws.getSignature().equals(signature)) break;
+            result.add(ws.getWord());
         }
 
         return result;
